@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .watch {
+            width: 100px;
+            height: 100px;
+            border: 10px solid #24ab15;
+            border-radius: 50%;
+            position: relative;
+            animation: spin 2s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .watch::before {
+            content: '';
+            width: 10px;
+            height: 40px;
+            background: #16b816;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+
+        .watch::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #2a9c04;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes joinHands {
+            0% { transform: translateX(-50%); }
+            50% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .hands {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: joinHands 1.5s ease-in-out infinite;
+            margin: 20px auto;
+        }
+
+        #approval-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #186800; /* Dark green background for approval */
+        }
+
+        #waiting-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: red; /* Red background for waiting */
+            color: white;
+        }
+
+        #form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .logo {
+            display: block;
+            margin: 20px auto;
+            width: 150px; /* Adjust the width as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .company-name {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhUo4b4EfFCbAXfgD10sXqv_hys-VA4Co",
+            authDomain: "buy-one-gram-employees.firebaseapp.com",
+            projectId: "buy-one-gram-employees",
+            storageBucket: "buy-one-gram-employees.appspot.com",
+            messagingSenderId: "799737329021",
+            appId : "1:799737329021:web:d2f3c0cf0c2921310e8814",
+            measurementId: "G-MDH33MMWS9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('visitor-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value;
+                const contact = document.getElementById('contact').value;
+                const purpose = document.getElementById('purpose').value;
+
+                const docId = Date.now().toString();
+
+                try {
+                    await setDoc(doc(db, 'entry', 'visitors'), {
+                        [docId]: {
+                            name: name,
+                            contact: contact,
+                            purpose: purpose,
+                            status: 'pending',
+                            time: new Date().toISOString()
+                        }
+                    }, { merge: true });
+
+                    document.getElementById('form-container').style.display = 'none';
+                    document.getElementById('waiting-screen').style.display = 'flex';
+
+                    const visitorDocRef = doc(db, 'entry', 'visitors');
+                    onSnapshot(visitorDocRef, (doc) => {
+                        const data = doc.data();
+                        if (data && data[docId] && data[docId].status === 'approved') {
+                            document.getElementById('waiting-screen').style.display = 'none';
+                            document.getElementById('approval-screen').style.display = 'flex';
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="form-container">
+        <img src="logo.png" alt="Company Logo" class="logo"> <!-- Replace with your logo URL -->
+        <div class="company-name">Buy One Gram Pvt Ltd</div>
+        <h1>Please Fill Your Details</h1>
+        <form id="visitor-form">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="text" id="contact" placeholder="Contact Number" required>
+            <input type="text" id="purpose" placeholder="Purpose of Visit" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div id="waiting-screen" style="display: none; flex-direction: column; align-items: center;">
+        <div class="watch"></div>
+        <h1 style="color: white;">Waiting for Approval from Office</h1>
+    </div>
+    <div id="approval-screen" style="display: none; flex-direction: column; align-items: center;">
+        <div class="hands">
+            <img src="hands-joining.svg" alt="Hands Joining" />
+        </div>
+        <h1 style="color: white;">Welcome to Buy One Gram !!</h1>
+    </div>
+</body>
+</html>

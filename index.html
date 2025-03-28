@@ -4,62 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visitor Form</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
         .watch {
-            width: 100px;
-            height: 100px;
-            border: 10px solid #24ab15;
+            width: 120px;
+            height: 120px;
+            border: 12px solid rgba(36, 171, 21, 0.3);
+            border-top: 12px solid #24ab15;
             border-radius: 50%;
             position: relative;
-            animation: spin 2s linear infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .watch::before {
-            content: '';
-            width: 10px;
-            height: 40px;
-            background: #16b816;
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 5px;
-        }
-
-        .watch::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background: #2a9c04;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        @keyframes joinHands {
-            0% { transform: translateX(-50%); }
-            50% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .hands {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             position: relative;
-            animation: joinHands 1.5s ease-in-out infinite;
-            margin: 20px auto;
+            margin: 20px auto 30px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .hands:after {
+            content: '\f2b5';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 80px;
+            color: #ffffff;
         }
 
         #approval-screen {
@@ -68,7 +66,11 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #186800; /* Dark green background for approval */
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #186800);
+            color: white;
+            text-align: center;
+            padding: 20px;
         }
 
         #waiting-screen {
@@ -77,53 +79,138 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: red; /* Red background for waiting */
+            width: 100%;
+            background: linear-gradient(135deg, #dc3545, #7d0000);
             color: white;
+            text-align: center;
+            padding: 20px;
         }
 
         #form-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
+            width: 100%;
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 30px;
             background: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
         }
 
         button {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             background: #28a745;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
         }
 
         button:hover {
             background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .logo {
             display: block;
-            margin: 20px auto;
-            width: 150px; /* Adjust the width as needed */
-            height: auto; /* Maintain aspect ratio */
+            margin: 0 auto 20px;
+            width: 180px;
+            height: auto;
+            border-radius: 10px;
         }
 
         .company-name {
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #28a745;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #495057;
+        }
+
+        .status-message {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .input-icon input {
+            padding-left: 45px;
+        }
+
+        .screen-animation {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
     <script type="module">
@@ -185,26 +272,41 @@
     </script>
 </head>
 <body>
-    <div id="form-container">
-        <img src="logo.png" alt="Company Logo" class="logo"> <!-- Replace with your logo URL -->
+    <div id="form-container" class="screen-animation">
+        <img src="/logo.jpeg" alt="Company Logo" class="logo">
         <div class="company-name">Buy One Gram Pvt Ltd</div>
         <h1>Please Fill Your Details</h1>
         <form id="visitor-form">
-            <input type="text" id="name" placeholder="Name" required>
-            <input type="text" id="contact" placeholder="Contact Number" required>
-            <input type="text" id="purpose" placeholder="Purpose of Visit" required>
-            <button type="submit">Submit</button>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="name" placeholder="Your Full Name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-phone"></i>
+                    <input type="text" id="contact" placeholder="Contact Number" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-briefcase"></i>
+                    <input type="text" id="purpose" placeholder="Purpose of Visit" required>
+                </div>
+            </div>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Submit Request</button>
         </form>
     </div>
-    <div id="waiting-screen" style="display: none; flex-direction: column; align-items: center;">
+    <div id="waiting-screen" class="screen-animation">
         <div class="watch"></div>
-        <h1 style="color: white;">Waiting for Approval from Office</h1>
+        <h1 class="status-message">Waiting for Approval</h1>
+        <p>Your request is being processed. Please wait a moment.</p>
     </div>
-    <div id="approval-screen" style="display: none; flex-direction: column; align-items: center;">
-        <div class="hands">
-            <img src="hands-joining.svg" alt="Hands Joining" />
-        </div>
-        <h1 style="color: white;">Welcome to Buy One Gram !!</h1>
+    <div id="approval-screen" class="screen-animation">
+        <div class="hands"></div>
+        <h1 class="status-message">Welcome to Buy One Gram !!</h1>
+        <p>Your visit has been approved. Please proceed to the reception.</p>
     </div>
 </body>
 </html>
